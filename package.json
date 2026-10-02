@@ -1,0 +1,25 @@
+{
+  "name": "widget-absen-maganghub",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "private": true,
+  "description": "Pengingat Absen MagangHub",
+  "author": "Antigravity",
+  "dependencies": {
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.maganghub.reminder",
+    "win": {
+      "target": "portable"
+    }
+  }
+}

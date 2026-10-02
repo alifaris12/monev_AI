@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagangHub Reminder</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --card-hover: #1c2128;
+            --border-color: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #2f81f7;
+            --accent-hover: #1f6feb;
+            --success-bg: rgba(35, 134, 54, 0.18);
+            --success-border: #238636;
+            --success-text: #3fb950;
+            --danger-bg: rgba(218, 54, 51, 0.18);
+            --danger-border: #da3633;
+            --danger-text: #f85149;
+            --warning-bg: rgba(210, 153, 34, 0.18);
+            --warning-border: #d29922;
+            --warning-text: #e3b341;
+            --purple-btn: #8957e5;
+            --purple-btn-hover: #733edb;
+        }
+
+        body {
+            margin: 0;
+            padding: 16px 18px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            user-select: none;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar Halus */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-icon {
+            width: 36px;
+            height: 36px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-text p {
+            margin: 2px 0 0;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .live-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--success-text);
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--success-text);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        /* Card Status */
+        .status-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .status-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .status-badge-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .status-badge-container.status-not_filled {
+            background-color: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+        }
+        .status-badge-container.status-not_filled .badge-label {
+            color: var(--danger-text);
+        }
+
+        .status-badge-container.status-filled {
+            background-color: var(--success-bg);
+            border: 1px solid var(--success-border);
+        }
+        .status-badge-container.status-filled .badge-label {
+            color: var(--success-text);
+        }
+
+        .status-badge-container.status-need_login,
+        .status-badge-container.status-unknown {
+            background-color: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+        }
+        .status-badge-container.status-need_login .badge-label,
+        .status-badge-container.status-unknown .badge-label {
+            color: var(--warning-text);
+        }
+
+        .badge-main {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-not_filled .badge-indicator { background-color: var(--danger-text); }
+        .status-filled .badge-indicator { background-color: var(--success-text); }
+        .status-need_login .badge-indicator,
+        .status-unknown .badge-indicator { background-color: var(--warning-text); }
+
+        .badge-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-check-web {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: #c9d1d9;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .btn-check-web:hover {
+            background-color: #30363d;
+            color: #fff;
+        }
+
+        .badge-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .status-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 8px;
+        }
+
+        .manual-btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-manual {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-manual:hover {
+            color: var(--text-main);
+            border-color: #8b949e;
+        }
+        .btn-manual.active-green {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+            color: var(--success-text);
+        }
+        .btn-manual.active-red {
+            background: var(--danger-bg);
+            border-color: var(--danger-border);
+            color: var(--danger-text);
+        }
+
+        /* Tombol Aksi Utama */
+        .primary-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        button.main-btn {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-autofill {
+            background: linear-gradient(135deg, #1f6feb 0%, #8957e5 100%);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(137, 87, 229, 0.3);
+        }
+        .btn-autofill:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        .btn-portal {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+        .btn-portal:hover {
+            background-color: var(--card-hover);
+            border-color: #8b949e;
+        }
+
+        /* Card Pengaturan Otomatis */
+        .settings-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .settings-header {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .setting-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .setting-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #30363d;
+            transition: .25s;
+            border-radius: 20px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .25s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Time input row */
+        .time-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        input[type="time"] {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+            flex-grow: 1;
+            color-scheme: dark;
+        }
+
+        .btn-save-time {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save-time:hover {
+            background-color: #30363d;
+        }
+        .btn-save-time.success {
+            background-color: var(--success-border);
+            color: white;
+            border-color: var(--success-border);
+        }
+
+        /* Template Accordion */
+        .accordion {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .accordion-header {
+            padding: 10px 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .accordion-body {
+            padding: 12px 14px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .accordion-body.open {
+            display: flex;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .char-count {
+            font-size: 10px;
+            color: var(--success-text);
+        }
+        .char-count.warning {
+            color: var(--danger-text);
+        }
+
+        textarea {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 8px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            resize: vertical;
+            min-height: 48px;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-save-templates {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: all 0.2s;
+        }
+        .btn-save-templates:hover {
+            background-color: #30363d;
+            color: #fff;
+        }
+        .btn-save-templates.success {
+            background-color: var(--success-border);
+            color: white;
+        }
+
+        /* Footer Test Alarm */
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: auto;
+            padding-top: 4px;
+        }
+
+        .btn-test {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-test:hover {
+            color: var(--text-main);
+            border-color: #8b949e;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 11px;
+            height: 11px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Card Input Kerjaan AI */
+        .ai-card {
+            background: linear-gradient(180deg, rgba(137, 87, 229, 0.09) 0%, var(--card-bg) 100%);
+            border: 1px solid rgba(137, 87, 229, 0.38);
+            border-radius: 10px;
+            padding: 13px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+            position: relative;
+        }
+
+        .ai-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .ai-sparkle-badge {
+            background: linear-gradient(135deg, #8957e5 0%, #2f81f7 100%);
+            color: #ffffff;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ai-input-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .ai-textarea {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 9px 11px;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 11px;
+            min-height: 62px;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s;
+            line-height: 1.45;
+        }
+        .ai-textarea:focus {
+            border-color: #8957e5;
+            box-shadow: 0 0 0 2px rgba(137, 87, 229, 0.25);
+        }
+
+        .ai-actions-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .btn-generate-ai {
+            background: linear-gradient(135deg, #8957e5 0%, #1f6feb 100%);
+            color: #ffffff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(137, 87, 229, 0.3);
+            flex-grow: 1;
+            justify-content: center;
+        }
+        .btn-generate-ai:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(137, 87, 229, 0.45);
+            opacity: 0.95;
+        }
+        .btn-generate-ai:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-ai-tool {
+            background: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 7px 9px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .btn-ai-tool:hover {
+            color: var(--text-main);
+            border-color: #8b949e;
+            background: #30363d;
+        }
+
+        .ai-status-msg {
+            font-size: 11px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            display: none;
+            align-items: flex-start;
+            gap: 6px;
+            line-height: 1.45;
+        }
+        .ai-status-msg.success {
+            display: flex;
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            color: var(--success-text);
+        }
+        .ai-status-msg.info {
+            display: flex;
+            background: rgba(47, 129, 247, 0.15);
+            border: 1px solid var(--accent);
+            color: #58a6ff;
+        }
+        .ai-status-msg.error {
+            display: flex;
+            background: var(--danger-bg);
+            border: 1px solid var(--danger-border);
+            color: var(--danger-text);
+        }
+
+        /* Collapsible API Key Box */
+        .ai-key-box {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            background: #11151c;
+            border: 1px dashed var(--border-color);
+            border-radius: 7px;
+            padding: 10px;
+            margin-top: 4px;
+        }
+        .ai-key-box.open {
+            display: flex;
+        }
+        .ai-key-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ai-key-input {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 5px 9px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            flex-grow: 1;
+            outline: none;
+        }
+        .ai-key-input:focus {
+            border-color: var(--accent);
+        }
+        .ai-key-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .ai-key-link {
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .ai-key-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-copy-all {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-copy-all:hover {
+            color: var(--text-main);
+            border-color: #8b949e;
+        }
+        .template-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-brand">
+            <div class="app-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+            <div class="header-text">
+                <h1>MagangHub Reminder</h1>
+                <p>Otomatisasi Absen & Pengingat</p>
+            </div>
+        </div>
+        <div class="live-tag">
+            <div class="pulse-dot"></div>
+            <span>Auto-Sync Aktif</span>
+        </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="status-box">
+        <div class="status-box-header">
+            <span>Status Absensi Hari Ini</span>
+            <span id="label-date">-</span>
+        </div>
+
+        <div class="status-badge-container status-not_filled" id="status-container">
+            <div class="badge-main">
+                <div class="badge-indicator"></div>
+                <div class="badge-label" id="status-title">MEMERIKSA WEB...</div>
+            </div>
+            <button class="btn-check-web" id="btn-check-web" title="Cek ulang dari web sekarang">
+                <svg id="icon-refresh" xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+                <span id="btn-check-text">Cek Web</span>
+            </button>
+        </div>
+
+        <div class="badge-desc" id="status-desc">
+            Sedang memeriksa status absensi dari website MagangHub...
+        </div>
+
+        <div class="status-footer">
+            <span id="status-last-checked">Terakhir dicek: -</span>
+            <div class="manual-btn-group">
+                <button class="btn-manual" id="btn-mark-filled" title="Tandai manual sudah diisi">✅ Sudah</button>
+                <button class="btn-manual" id="btn-mark-unfilled" title="Tandai manual belum diisi">❌ Belum</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card AI: Catatan Kerjaan Hari Ini -->
+    <div class="ai-card">
+        <div class="ai-card-header">
+            <div class="ai-card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #a371f7;">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
+                </svg>
+                <span>Kerjaan Hari Ini (AI Assistant)</span>
+            </div>
+            <div class="ai-sparkle-badge">
+                <span>✨ Auto Logbook</span>
+            </div>
+        </div>
+
+        <div class="ai-input-desc">
+            Ketikkan pekerjaan yang kamu kerjakan hari ini (bisa poin-poin/santai). AI akan menyusun <b>Uraian Aktivitas, Pembelajaran, & Kendala</b> secara otomatis (min. 100 karakter).
+        </div>
+
+        <textarea id="input-today-work" class="ai-textarea" rows="2" placeholder="Contoh: Pagi meeting progres dengan mentor, lanjut slicing UI login dan perbaiki bug responsive navbar. Sempat error CORS pas integrasi API tapi beres setelah update proxy..."></textarea>
+
+        <div class="ai-actions-row">
+            <button class="btn-generate-ai" id="btn-generate-ai">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span id="btn-generate-ai-text">✨ Sesuaikan dengan AI</span>
+            </button>
+            <button class="btn-ai-tool" id="btn-clear-work" title="Hapus catatan">
+                Hapus
+            </button>
+            <button class="btn-ai-tool" id="btn-toggle-ai-key" title="Pengaturan Gemini API Key">
+                ⚙️ API
+            </button>
+        </div>
+
+        <!-- API Key Settings Drawer (Collapsible) -->
+        <div class="ai-key-box" id="ai-key-box">
+            <div class="ai-key-hint">
+                <b>Gemini API Key (Opsional)</b>: Masukkan API Key gratis dari Google AI Studio untuk kecerdasan LLM cloud. Jika dikosongkan, sistem tetap bekerja 100% menggunakan <b>Intelligent Generator bawaan</b> (offline & tanpa kuota).
+            </div>
+            <div class="ai-key-row">
+                <input type="password" id="gemini-api-key" class="ai-key-input" placeholder="Paste Gemini API Key di sini...">
+                <button class="btn-save-time" id="btn-save-api-key">Simpan Key</button>
+            </div>
+            <div class="ai-key-hint">
+                Belum punya key? <span class="ai-key-link" id="link-get-gemini-key">👉 Dapatkan gratis di Google AI Studio</span>
+            </div>
+        </div>
+
+        <!-- AI Notification Status -->
+        <div class="ai-status-msg" id="ai-status-msg"></div>
+    </div>
+
+    <!-- Tombol Aksi Utama -->
+    <div class="primary-actions">
+        <button class="main-btn btn-autofill" id="btn-autofill">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span id="btn-autofill-text">⚡ Isi Absen Otomatis Sekarang</span>
+        </button>
+        <button class="main-btn btn-portal" id="btn-open-portal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            Buka Portal MagangHub
+        </button>
+    </div>
+
+    <!-- Card Pengaturan Otomatis -->
+    <div class="settings-card">
+        <div class="settings-header">Fitur Otomatis</div>
+
+        <!-- Auto-Start Switch -->
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Mulai Otomatis saat Windows Boot</span>
+                <span class="setting-sub">Widget langsung aktif di tray saat laptop menyala</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-autostart" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Auto-Fill On Alarm Switch -->
+        <div class="setting-row">
+            <div class="setting-label">
+                <span>Otomatis Isi Absen pada Jam Alarm</span>
+                <span class="setting-sub">Jika jam tiba & belum diisi, bot akan otomatis mengisi form</span>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="toggle-autofill-alarm" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <!-- Jam Alarm -->
+        <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+            <div class="setting-label">
+                <span>Jam Pengingat / Auto-Fill (Senin - Jumat)</span>
+            </div>
+            <div class="time-row" style="width: 100%;">
+                <input type="time" id="alarm-time" required>
+                <button class="btn-save-time" id="btn-save-time">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Accordion Template Isi Otomatis -->
+    <div class="accordion">
+        <div class="accordion-header" id="accordion-toggle">
+            <span>⚙️ Template Isi Absen Otomatis</span>
+            <span id="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-body" id="accordion-content">
+            <div class="field-group">
+                <div class="field-header">
+                    <span>1. Uraian Aktivitas (Min 100 Karakter)</span>
+                    <span class="char-count" id="count-activity">0/100</span>
+                </div>
+                <textarea id="tpl-activity" rows="2"></textarea>
+            </div>
+
+            <div class="field-group">
+                <div class="field-header">
+                    <span>2. Pelajaran yang Diperoleh (Min 100 Karakter)</span>
+                    <span class="char-count" id="count-learning">0/100</span>
+                </div>
+                <textarea id="tpl-learning" rows="2"></textarea>
+            </div>
+
+            <div class="field-group">
+                <div class="field-header">
+                    <span>3. Kendala yang Dialami (Min 100 Karakter)</span>
+                    <span class="char-count" id="count-issue">0/100</span>
+                </div>
+                <textarea id="tpl-issue" rows="2"></textarea>
+            </div>
+
+            <div class="template-actions">
+                <button class="btn-copy-all" id="btn-copy-all" title="Salin semua bagian logbook ke clipboard">📋 Salin Laporan</button>
+                <button class="btn-save-templates" id="btn-save-templates">Simpan Template</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-row">
+        <span>Polling tiap 5 mnt</span>
+        <button class="btn-test" id="btn-test">🔔 Test Alarm & Suara</button>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let currentConfig = null;
+
+        // Elemen UI Utama
+        const statusContainer = document.getElementById('status-container');
+        const statusTitle = document.getElementById('status-title');
+        const statusDesc = document.getElementById('status-desc');
+        const labelDate = document.getElementById('label-date');
+        const statusLastChecked = document.getElementById('status-last-checked');
+        const btnCheckWeb = document.getElementById('btn-check-web');
+        const btnCheckText = document.getElementById('btn-check-text');
+        const iconRefresh = document.getElementById('icon-refresh');
+        const btnMarkFilled = document.getElementById('btn-mark-filled');
+        const btnMarkUnfilled = document.getElementById('btn-mark-unfilled');
+        const btnAutoFill = document.getElementById('btn-autofill');
+        const btnAutoFillText = document.getElementById('btn-autofill-text');
+        const toggleAutoStart = document.getElementById('toggle-autostart');
+        const toggleAutoFillAlarm = document.getElementById('toggle-autofill-alarm');
+        const alarmTimeInput = document.getElementById('alarm-time');
+        const btnSaveTime = document.getElementById('btn-save-time');
+        const tplActivity = document.getElementById('tpl-activity');
+        const tplLearning = document.getElementById('tpl-learning');
+        const tplIssue = document.getElementById('tpl-issue');
+        const countActivity = document.getElementById('count-activity');
+        const countLearning = document.getElementById('count-learning');
+        const countIssue = document.getElementById('count-issue');
+        const btnSaveTemplates = document.getElementById('btn-save-templates');
+        const accordionToggle = document.getElementById('accordion-toggle');
+        const accordionContent = document.getElementById('accordion-content');
+        const accordionIcon = document.getElementById('accordion-icon');
+
+        // Elemen Fitur AI
+        const inputTodayWork = document.getElementById('input-today-work');
+        const btnGenerateAi = document.getElementById('btn-generate-ai');
+        const btnGenerateAiText = document.getElementById('btn-generate-ai-text');
+        const btnClearWork = document.getElementById('btn-clear-work');
+        const btnToggleAiKey = document.getElementById('btn-toggle-ai-key');
+        const aiKeyBox = document.getElementById('ai-key-box');
+        const geminiApiKeyInput = document.getElementById('gemini-api-key');
+        const btnSaveApiKey = document.getElementById('btn-save-api-key');
+        const linkGetGeminiKey = document.getElementById('link-get-gemini-key');
+        const aiStatusMsg = document.getElementById('ai-status-msg');
+        const btnCopyAll = document.getElementById('btn-copy-all');
+
+        // Format tanggal Indonesia
+        function getFormattedDate(dateStr) {
+            try {
+                const date = dateStr ? new Date(dateStr) : new Date();
+                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+                return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+            } catch(e) {
+                return dateStr || '';
+            }
+        }
+
+        // Render Status ke UI
+        function renderStatus(attendance) {
+            if (!attendance) return;
+
+            labelDate.innerText = getFormattedDate(attendance.date);
+            const liveTag = document.querySelector('.live-tag span');
+
+            statusContainer.className = 'status-badge-container';
+            btnMarkFilled.classList.remove('active-green');
+            btnMarkUnfilled.classList.remove('active-red');
+
+            if (attendance.status === 'filled') {
+                statusContainer.classList.add('status-filled');
+                statusTitle.innerText = 'SUDAH DIISI';
+                statusDesc.innerText = 'Laporan absensi hari ini sudah terisi. Status ini tersimpan dan otomatis di-reset saat pergantian hari (00:00 WIB).';
+                statusLastChecked.innerText = (attendance.lastChecked ? `Dicek: ${attendance.lastChecked} WIB` : 'Terisi') + ' • Reset jam 00:00';
+                btnMarkFilled.classList.add('active-green');
+                if (liveTag) liveTag.innerText = 'Hari Ini Tuntas';
+            } else if (attendance.status === 'not_filled') {
+                statusContainer.classList.add('status-not_filled');
+                statusTitle.innerText = 'BELUM DIISI';
+                statusDesc.innerText = attendance.message || 'Kamu belum mengisi laporan harian / absen hari ini!';
+                statusLastChecked.innerText = attendance.lastChecked ? `Dicek: ${attendance.lastChecked} WIB` : 'Belum dicek';
+                btnMarkUnfilled.classList.add('active-red');
+                if (liveTag) liveTag.innerText = 'Auto-Sync Aktif';
+            } else if (attendance.status === 'need_login') {
+                statusContainer.classList.add('status-need_login');
+                statusTitle.innerText = 'PERLU LOGIN';
+                statusDesc.innerText = 'Klik "Buka Portal MagangHub" untuk login ke akun SIAPkerja Anda.';
+                statusLastChecked.innerText = attendance.lastChecked ? `Dicek: ${attendance.lastChecked} WIB` : 'Belum login';
+                if (liveTag) liveTag.innerText = 'Perlu Login';
+            } else {
+                statusContainer.classList.add('status-unknown');
+                statusTitle.innerText = 'MEMERIKSA...';
+                statusDesc.innerText = attendance.message || 'Sedang memeriksa status absensi web...';
+                statusLastChecked.innerText = 'Memeriksa...';
+                if (liveTag) liveTag.innerText = 'Auto-Sync Aktif';
+            }
+        }
+
+        function updateCharCounters() {
+            const update = (el, counter) => {
+                const len = el.value.length;
+                counter.innerText = `${len}/100`;
+                if (len >= 100) {
+                    counter.className = 'char-count';
+                } else {
+                    counter.className = 'char-count warning';
+                }
+            };
+            update(tplActivity, countActivity);
+            update(tplLearning, countLearning);
+            update(tplIssue, countIssue);
+        }
+
+        // Tampilkan pesan status AI
+        function showAiStatus(type, message, duration = 6000) {
+            aiStatusMsg.className = `ai-status-msg ${type}`;
+            aiStatusMsg.innerHTML = message;
+            aiStatusMsg.style.display = 'flex';
+            if (duration > 0) {
+                setTimeout(() => {
+                    aiStatusMsg.style.display = 'none';
+                }, duration);
+            }
+        }
+
+        // Muat Konfigurasi Awal
+        ipcRenderer.invoke('get-config').then(cfg => {
+            currentConfig = cfg;
+            alarmTimeInput.value = cfg.alarmTime || '17:00';
+            toggleAutoStart.checked = cfg.autoStart !== false;
+            toggleAutoFillAlarm.checked = cfg.autoFillOnAlarm !== false;
+
+            if (cfg.geminiApiKey) {
+                geminiApiKeyInput.value = cfg.geminiApiKey;
+            }
+
+            if (cfg.todayWorkInput) {
+                inputTodayWork.value = cfg.todayWorkInput;
+            }
+
+            if (cfg.templates) {
+                tplActivity.value = cfg.templates.activity || '';
+                tplLearning.value = cfg.templates.learning || '';
+                tplIssue.value = cfg.templates.issue || '';
+                updateCharCounters();
+            }
+
+            if (cfg.attendance) {
+                renderStatus(cfg.attendance);
+            }
+        });
+
+        // Event listener saat status berubah dari background
+        ipcRenderer.on('status-updated', (event, updatedAttendance) => {
+            renderStatus(updatedAttendance);
+            btnCheckWeb.disabled = false;
+            btnCheckText.innerText = 'Cek Web';
+            iconRefresh.style.display = 'inline-block';
+        });
+
+        // Event listener saat hari berganti (reset input kerjaan)
+        ipcRenderer.on('work-input-reset', () => {
+            inputTodayWork.value = '';
+            showAiStatus('info', '🗓️ Hari baru telah dimulai! Silakan masukkan catatan pekerjaan baru hari ini.', 5000);
+        });
+
+        // Simpan input catatan kerja saat diketik (debounced)
+        let saveWorkTimer = null;
+        inputTodayWork.addEventListener('input', () => {
+            clearTimeout(saveWorkTimer);
+            saveWorkTimer = setTimeout(() => {
+                ipcRenderer.send('save-config', { todayWorkInput: inputTodayWork.value });
+            }, 800);
+        });
+
+        // Tombol Bersihkan Catatan
+        btnClearWork.addEventListener('click', () => {
+            inputTodayWork.value = '';
+            ipcRenderer.send('save-config', { todayWorkInput: '' });
+            inputTodayWork.focus();
+        });
+
+        // Toggle Box Pengaturan Gemini API Key
+        btnToggleAiKey.addEventListener('click', () => {
+            aiKeyBox.classList.toggle('open');
+        });
+
+        // Simpan Gemini API Key
+        btnSaveApiKey.addEventListener('click', () => {
+            const keyVal = geminiApiKeyInput.value.trim();
+            ipcRenderer.send('save-config', { geminiApiKey: keyVal });
+            const origText = btnSaveApiKey.innerText;
+            btnSaveApiKey.innerText = 'Tersimpan!';
+            btnSaveApiKey.classList.add('success');
+            showAiStatus('success', keyVal ? '🔑 Gemini API Key berhasil disimpan!' : '⚙️ API Key dikosongkan. Menggunakan AI Generator bawaan.', 4000);
+            setTimeout(() => {
+                btnSaveApiKey.innerText = origText;
+                btnSaveApiKey.classList.remove('success');
+            }, 1500);
+        });
+
+        // Link Buka Google AI Studio
+        linkGetGeminiKey.addEventListener('click', () => {
+            ipcRenderer.send('open-external-url', 'https://aistudio.google.com/app/apikey');
+        });
+
+        // Eksekusi Generate Laporan dengan AI
+        btnGenerateAi.addEventListener('click', async () => {
+            const workText = inputTodayWork.value.trim();
+            if (!workText) {
+                showAiStatus('error', '⚠️ Silakan tuliskan kegiatan / pekerjaan yang kamu lakukan hari ini terlebih dahulu.');
+                inputTodayWork.focus();
+                return;
+            }
+
+            btnGenerateAi.disabled = true;
+            btnGenerateAiText.innerHTML = '<span class="spinner"></span> AI Menyusun Laporan...';
+
+            try {
+                const res = await ipcRenderer.invoke('generate-ai-logbook', {
+                    workInput: workText,
+                    apiKey: geminiApiKeyInput.value.trim()
+                });
+
+                if (res && res.success && res.data) {
+                    // Update field template
+                    tplActivity.value = res.data.activity;
+                    tplLearning.value = res.data.learning;
+                    tplIssue.value = res.data.issue;
+                    updateCharCounters();
+
+                    // Simpan otomatis ke config
+                    const updatedTemplates = {
+                        activity: res.data.activity,
+                        learning: res.data.learning,
+                        issue: res.data.issue
+                    };
+                    ipcRenderer.send('save-config', { templates: updatedTemplates });
+
+                    // Buka accordion template agar user bisa langsung memeriksa hasil
+                    accordionContent.classList.add('open');
+                    accordionIcon.innerText = '▲';
+
+                    const aiSourceLabel = res.source === 'gemini' ? 'Google Gemini AI' : 'Intelligent AI Generator Bawaan';
+                    let successNotice = `✨ <b>Laporan berhasil dibuat!</b> Disesuaikan oleh ${aiSourceLabel} dan otomatis disimpan ke template.`;
+                    if (res.fallbackNotice) {
+                        successNotice += `<br><small style="opacity:0.85;">ℹ️ ${res.fallbackNotice}</small>`;
+                    }
+                    showAiStatus('success', successNotice, 8000);
+                } else {
+                    showAiStatus('error', 'Gagal memproses laporan: ' + (res.error || 'Terjadi kesalahan sistem'));
+                }
+            } catch (err) {
+                console.error(err);
+                showAiStatus('error', 'Terjadi kesalahan: ' + err.message);
+            } finally {
+                btnGenerateAi.disabled = false;
+                btnGenerateAiText.innerText = '✨ Sesuaikan dengan AI';
+            }
+        });
+
+        // Salin Semua Bagian Laporan ke Clipboard
+        btnCopyAll.addEventListener('click', () => {
+            const fullReport = `=== LAPORAN HARIAN MAGANGHUB ===
+Tanggal: ${labelDate.innerText}
+
+1. URAIAN AKTIVITAS:
+${tplActivity.value}
+
+2. PELAJARAN YANG DIPEROLEH:
+${tplLearning.value}
+
+3. KENDALA YANG DIALAMI:
+${tplIssue.value}`;
+
+            navigator.clipboard.writeText(fullReport).then(() => {
+                const orig = btnCopyAll.innerText;
+                btnCopyAll.innerText = '✅ Tersalin!';
+                setTimeout(() => {
+                    btnCopyAll.innerText = orig;
+                }, 1500);
+            }).catch(err => {
+                console.error('Gagal menyalin:', err);
+            });
+        });
+
+        // Input Counter Listeners
+        [tplActivity, tplLearning, tplIssue].forEach(el => {
+            el.addEventListener('input', updateCharCounters);
+        });
+
+        // Accordion Toggle
+        accordionToggle.addEventListener('click', () => {
+            const isOpen = accordionContent.classList.toggle('open');
+            accordionIcon.innerText = isOpen ? '▲' : '▼';
+        });
+
+        // Simpan Jam
+        btnSaveTime.addEventListener('click', () => {
+            const timeVal = alarmTimeInput.value;
+            if (timeVal) {
+                ipcRenderer.send('save-config', { alarmTime: timeVal });
+                const orig = btnSaveTime.innerText;
+                btnSaveTime.innerText = 'Disimpan!';
+                btnSaveTime.classList.add('success');
+                setTimeout(() => {
+                    btnSaveTime.innerText = orig;
+                    btnSaveTime.classList.remove('success');
+                }, 1500);
+            }
+        });
+
+        // Toggle Auto-Start & Auto-Fill Switches
+        toggleAutoStart.addEventListener('change', () => {
+            ipcRenderer.send('save-config', { autoStart: toggleAutoStart.checked });
+        });
+
+        toggleAutoFillAlarm.addEventListener('change', () => {
+            ipcRenderer.send('save-config', { autoFillOnAlarm: toggleAutoFillAlarm.checked });
+        });
+
+        // Simpan Template Manual
+        btnSaveTemplates.addEventListener('click', () => {
+            const templates = {
+                activity: tplActivity.value,
+                learning: tplLearning.value,
+                issue: tplIssue.value
+            };
+            ipcRenderer.send('save-config', { templates });
+            const orig = btnSaveTemplates.innerText;
+            btnSaveTemplates.innerText = 'Template Tersimpan!';
+            btnSaveTemplates.classList.add('success');
+            setTimeout(() => {
+                btnSaveTemplates.innerText = orig;
+                btnSaveTemplates.classList.remove('success');
+            }, 1500);
+        });
+
+        // Eksekusi Auto-Fill Sekarang
+        btnAutoFill.addEventListener('click', async () => {
+            btnAutoFill.disabled = true;
+            btnAutoFillText.innerHTML = '<span class="spinner"></span> Menjalankan Auto-Fill...';
+            try {
+                await ipcRenderer.invoke('trigger-autofill');
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setTimeout(() => {
+                    btnAutoFill.disabled = false;
+                    btnAutoFillText.innerText = '⚡ Isi Absen Otomatis Sekarang';
+                }, 4000);
+            }
+        });
+
+        // Cek Web Manual
+        btnCheckWeb.addEventListener('click', async () => {
+            btnCheckWeb.disabled = true;
+            btnCheckText.innerHTML = '<span class="spinner"></span>';
+            iconRefresh.style.display = 'none';
+            statusDesc.innerText = 'Memeriksa status dari web...';
+
+            try {
+                const res = await ipcRenderer.invoke('check-web-status');
+                renderStatus(res);
+            } finally {
+                btnCheckWeb.disabled = false;
+                btnCheckText.innerText = 'Cek Web';
+                iconRefresh.style.display = 'inline-block';
+            }
+        });
+
+        // Override Manual
+        btnMarkFilled.addEventListener('click', () => ipcRenderer.send('set-manual-status', 'filled'));
+        btnMarkUnfilled.addEventListener('click', () => ipcRenderer.send('set-manual-status', 'not_filled'));
+
+        // Buka Portal
+        document.getElementById('btn-open-portal').addEventListener('click', () => {
+            ipcRenderer.send('open-portal');
+        });
+
+        // Test Alarm
+        document.getElementById('btn-test').addEventListener('click', () => {
+            ipcRenderer.send('test-alarm');
+        });
+    </script>
+</body>
+</html>
